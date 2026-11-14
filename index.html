@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>In Sala — Adesso al Pronto Soccorso del GOM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F1418; --card: #182027; --card2: #212B33; --line: #2C3740;
+    --text: #F2EFE9; --muted: #A3ADB5; --accent: #F2B65A;
+    --rosso: #E5484D; --arancione: #F5A524; --azzurro: #7CC4E8; --verde: #3DBE6E; --bianco: #F2EFE9;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 20px 20px 40px; display: flex; flex-direction: column; gap: 16px; }
+  .display { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+  header { display: flex; justify-content: space-between; align-items: center; }
+  .brand { display: flex; align-items: center; gap: 8px; font-size: 20px; }
+  .mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+  .pill { font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+  .card { background: var(--card); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .card.alt { background: var(--card2); }
+  .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .status { display: flex; align-items: center; gap: 10px; font-size: 30px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .num { font-size: 36px; line-height: 1; }
+  .small { font-size: 13px; color: var(--muted); }
+  .trend { font-size: 12px; font-weight: 600; color: var(--accent); }
+  .colors { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .chip { background: var(--card2); border-radius: 12px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .chip b { font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; }
+  .chip span { font-size: 11.5px; color: var(--muted); }
+  svg text { font-family: Inter, sans-serif; }
+  p { margin: 0; font-size: 14px; line-height: 1.5; }
+  a { color: var(--accent); }
+  .warn { background: #3A2E1A; border-radius: 12px; padding: 12px 14px; font-size: 14px; display: none; }
+  footer { font-size: 12.5px; line-height: 1.5; color: var(--muted); display: flex; flex-direction: column; gap: 6px; padding-top: 4px; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <div class="brand display">
+      <span class="mark"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F1418" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><polyline points="12 7 12 12 15 14"/></svg></span>
+      In Sala
+    </div>
+    <span class="pill">GOM · Riuniti</span>
+  </header>
+
+  <div class="warn" id="warn" role="status"></div>
+
+  <section class="card" aria-labelledby="t-adesso">
+    <div class="row">
+      <span class="label" id="t-adesso">Pronto Soccorso adesso</span>
+      <span class="small" id="ora">—</span>
+    </div>
+    <div class="status display"><span class="dot" id="dot" style="background: var(--muted)"></span><span id="stato">Caricamento…</span></div>
+    <div class="grid3">
+      <div><div class="num display" id="attesa">—</div><div class="small">in attesa</div><div class="trend" id="trend"></div></div>
+      <div><div class="num display" id="entrati">—</div><div class="small">già dentro</div></div>
+      <div><div class="num display" id="casi">—</div><div class="small">casi in 24 ore</div></div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="t-colori">
+    <span class="label" id="t-colori">Già dentro, per codice</span>
+    <div class="colors">
+      <div class="chip"><span class="dot" style="background: var(--rosso)"></span><b id="c-rossi">—</b><span>Rosso</span></div>
+      <div class="chip"><span class="dot" style="background: var(--arancione)"></span><b id="c-arancioni">—</b><span>Arancione</span></div>
+      <div class="chip"><span class="dot" style="background: var(--azzurro)"></span><b id="c-azzurri">—</b><span>Azzurro</span></div>
+      <div class="chip"><span class="dot" style="background: var(--verde)"></span><b id="c-verdi">—</b><span>Verde</span></div>
+      <div class="chip"><span class="dot" style="background: var(--bianco)"></span><b id="c-bianchi">—</b><span>Bianco</span></div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="t-giorno">
+    <span class="label" id="t-giorno">Persone in attesa, ultime 24 ore</span>
+    <svg id="grafico" viewBox="0 0 400 150" width="100%" role="img" aria-label="Andamento delle persone in attesa nelle ultime 24 ore"></svg>
+    <span class="small" id="nota-grafico"></span>
+  </section>
+
+  <section class="card alt">
+    <span class="label">Quanto si aspetta</span>
+    <p>Le stime arrivano presto. Stiamo registrando il monitor ogni 5 minuti: con qualche settimana di dati qui comparirà quanto si aspetta di solito, per giorno e ora.</p>
+  </section>
+
+  <section class="card alt">
+    <span class="label">Perché qualcuno passa prima</span>
+    <p>L'ordine non è quello di arrivo. Passano prima i codici più gravi e, a parità di colore, le persone più fragili, per esempio gli anziani. Anche la sala o il percorso assegnato cambia i tempi.</p>
+  </section>
+
+  <footer>
+    <span>Dati dal <a href="https://prontosoccorso.ospedalerc.it/areasLoginBridge/">monitor pubblico del GOM</a>, letti ogni 5 minuti. Possono arrivare con qualche minuto di ritardo.</span>
+    <span>Anteprima di un servizio indipendente, non collegato all'ospedale. In caso di emergenza chiama il 118.</span>
+  </footer>
+</main>
+
+<script>
+const URL_DATI = 'https://raw.githubusercontent.com/denisediprima69/insala-monitor/main/data/ultimo.json';
+const $ = id => document.getElementById(id);
+const oraRoma = iso => new Date(iso).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' });
+
+function coloreStato(s) {
+  const t = (s || '').toLowerCase();
+  if (t.includes('molto') || t.includes('critic') || t.includes('sovraff')) return 'var(--rosso)';
+  if (t.includes('affoll')) return 'var(--accent)';
+  return 'var(--verde)';
+}
+
+function disegna(letture) {
+  const svg = $('grafico');
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const ns = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs, text) => { const n = document.createElementNS(ns, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (text != null) n.textContent = text; svg.appendChild(n); return n; };
+  if (letture.length < 2) { $('nota-grafico').textContent = 'Il grafico si riempie man mano che arrivano le letture.'; return; }
+  const W = 400, H = 150, x0 = 28, x1 = 392, y0 = 12, y1 = 124;
+  const ts = letture.map(l => Date.parse(l.t)), vs = letture.map(l => l.attesa);
+  const tMin = Math.min(...ts), tMax = Math.max(...ts), vMax = Math.max(5, ...vs);
+  const X = t => x0 + (t - tMin) / Math.max(1, tMax - tMin) * (x1 - x0);
+  const Y = v => y1 - v / vMax * (y1 - y0);
+  [0, Math.round(vMax / 2), vMax].forEach(v => {
+    el('line', { x1: x0, x2: x1, y1: Y(v), y2: Y(v), stroke: '#2C3740', 'stroke-width': 1 });
+    el('text', { x: x0 - 6, y: Y(v) + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#A3ADB5' }, v);
+  });
+  const area = 'M' + X(ts[0]) + ' ' + y1 + ' ' + ts.map((t, i) => 'L' + X(t) + ' ' + Y(vs[i])).join(' ') + ' L' + X(ts[ts.length - 1]) + ' ' + y1 + 'Z';
+  el('path', { d: area, fill: 'rgba(242,182,90,0.15)' });
+  el('path', { d: ts.map((t, i) => (i ? 'L' : 'M') + X(t) + ' ' + Y(vs[i])).join(' '), fill: 'none', stroke: '#F2B65A', 'stroke-width': 2, 'stroke-linejoin': 'round' });
+  el('circle', { cx: X(ts[ts.length - 1]), cy: Y(vs[vs.length - 1]), r: 4, fill: '#F2B65A' });
+  el('text', { x: x0, y: 144, 'font-size': 11, fill: '#A3ADB5' }, oraRoma(letture[0].t));
+  el('text', { x: x1, y: 144, 'text-anchor': 'end', 'font-size': 11, fill: '#A3ADB5' }, 'adesso');
+  const ore = Math.round((tMax - tMin) / 3600000);
+  $('nota-grafico').textContent = ore < 24 ? 'Registrazione partita da ' + (ore || 'meno di 1') + (ore === 1 ? ' ora' : ' ore') + ': il grafico si allunga fino a 24 ore.' : '';
+}
+
+async function aggiorna() {
+  try {
+    const r = await fetch(URL_DATI + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    const L = d.letture;
+    if (!L.length) throw new Error('vuoto');
+    const u = L[L.length - 1];
+    $('stato').textContent = u.affollamento;
+    $('dot').style.background = coloreStato(u.affollamento);
+    $('attesa').textContent = u.attesa;
+    $('entrati').textContent = u.entrati;
+    $('casi').textContent = u.casi24h;
+    ['rossi', 'arancioni', 'azzurri', 'verdi', 'bianchi'].forEach(k => $('c-' + k).textContent = u[k]);
+    $('ora').textContent = 'letto alle ' + oraRoma(u.t);
+
+    const unOraFa = Date.parse(u.t) - 3600000;
+    const prima = L.filter(l => Date.parse(l.t) <= unOraFa + 5 * 60000).pop();
+    if (prima) {
+      const diff = u.attesa - prima.attesa;
+      $('trend').textContent = diff > 0 ? '↑ ' + diff + ' in un’ora' : diff < 0 ? '↓ ' + (-diff) + ' in un’ora' : 'stabile da un’ora';
+    } else { $('trend').textContent = ''; }
+
+    const vecchio = (Date.now() - Date.parse(u.t)) / 60000;
+    const w = $('warn');
+    if (vecchio > 20) { w.style.display = 'block'; w.textContent = 'Ultima lettura ' + Math.round(vecchio) + ' minuti fa: i dati potrebbero non essere aggiornati.'; }
+    else { w.style.display = 'none'; }
+    disegna(L);
+  } catch (e) {
+    const w = $('warn');
+    w.style.display = 'block';
+    w.textContent = 'Non riesco a caricare i dati in questo momento. Riprovo tra un minuto.';
+  }
+}
+aggiorna();
+setInterval(aggiorna, 60000);
+</script>
+</body>
+</html>
