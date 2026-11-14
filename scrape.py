@@ -9,6 +9,7 @@ di un browser. Il ticket non viene mai salvato.
 import csv
 import html
 import http.cookiejar
+import json
 import os
 import re
 import sys
@@ -107,7 +108,33 @@ def main():
         print(row)
         return
     path = append_row(row, now)
+    write_latest(now)
     print("Salvato in %s: %s in attesa, %s" % (os.path.basename(path), row["in_attesa"], row["affollamento"]))
+
+
+def write_latest(now):
+    """Scrive data/ultimo.json: l'ultima lettura e le ultime 24 ore, per la pagina pubblica."""
+    rows = []
+    mesi = sorted(n for n in os.listdir(DATA_DIR) if n.startswith("monitor_gom_") and n.endswith(".csv"))
+    for name in mesi[-2:]:
+        with open(os.path.join(DATA_DIR, name), encoding="utf-8") as f:
+            rows.extend(csv.DictReader(f))
+    limite = now.timestamp() - 24 * 3600
+    recenti = []
+    for r in rows:
+        t = datetime.strptime(r["letto_utc"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp()
+        if t >= limite:
+            recenti.append({
+                "t": r["letto_utc"],
+                "attesa": int(r["in_attesa"]),
+                "entrati": int(r["totale_entrati"]),
+                "rossi": int(r["rossi_entrati"]), "arancioni": int(r["arancioni_entrati"]),
+                "azzurri": int(r["azzurri_entrati"]), "verdi": int(r["verdi_entrati"]),
+                "bianchi": int(r["bianchi_entrati"]),
+                "affollamento": r["affollamento"], "casi24h": int(r["casi_24h"]),
+            })
+    with open(os.path.join(DATA_DIR, "ultimo.json"), "w", encoding="utf-8") as f:
+        json.dump({"aggiornato": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "letture": recenti}, f, ensure_ascii=False)
 
 
 if __name__ == "__main__":
