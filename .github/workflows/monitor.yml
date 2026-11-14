@@ -1,12 +1,21 @@
 name: Registra monitor PS
 
+# Un'esecuzione resta attiva per quasi 6 ore e legge il monitor ogni 5 minuti.
+# Alla fine fa ripartire se stessa. L'orario programmato fa da riserva,
+# nel caso la catena si interrompa.
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "23 * * * *"
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/monitor.yml"
+      - "scrape.py"
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: monitor
@@ -15,7 +24,7 @@ concurrency:
 jobs:
   leggi:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
 
@@ -23,14 +32,28 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Leggi il monitor
-        run: python scrape.py
-
-      - name: Salva i dati
+      - name: Leggi il monitor ogni 5 minuti
         run: |
           git config user.name "insala-bot"
           git config user.email "insala-bot@users.noreply.github.com"
-          git add data/
-          git diff --cached --quiet && exit 0
-          git commit -m "Monitor $(TZ=Europe/Rome date '+%Y-%m-%d %H:%M')"
-          for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done
+          fine=$(( $(date +%s) + 340*60 ))
+          while [ "$(date +%s)" -lt "$fine" ]; do
+            inizio=$(date +%s)
+            if python scrape.py; then
+              git add data/
+              if ! git diff --cached --quiet; then
+                git commit -q -m "Monitor $(TZ=Europe/Rome date '+%Y-%m-%d %H:%M')"
+                for i in 1 2 3; do git pull -q --rebase && git push -q && break; sleep 5; done
+              fi
+            else
+              echo "Lettura non riuscita, riprovo al prossimo giro"
+            fi
+            attesa=$(( 300 - ($(date +%s) - inizio) ))
+            [ "$attesa" -gt 0 ] && sleep "$attesa"
+          done
+
+      - name: Riparti
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run monitor.yml --ref main
