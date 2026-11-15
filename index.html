@@ -127,9 +127,18 @@ function disegna(letture) {
     el('line', { x1: x0, x2: x1, y1: Y(v), y2: Y(v), stroke: '#2C3740', 'stroke-width': 1 });
     el('text', { x: x0 - 6, y: Y(v) + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#A3ADB5' }, v);
   });
-  const area = 'M' + X(ts[0]) + ' ' + y1 + ' ' + ts.map((t, i) => 'L' + X(t) + ' ' + Y(vs[i])).join(' ') + ' L' + X(ts[ts.length - 1]) + ' ' + y1 + 'Z';
-  el('path', { d: area, fill: 'rgba(242,182,90,0.15)' });
-  el('path', { d: ts.map((t, i) => (i ? 'L' : 'M') + X(t) + ' ' + Y(vs[i])).join(' '), fill: 'none', stroke: '#F2B65A', 'stroke-width': 2, 'stroke-linejoin': 'round' });
+  // Spezza la linea dove mancano letture per più di 20 minuti, così un buco non sembra un dato.
+  const tratti = [];
+  ts.forEach((t, i) => {
+    if (i === 0 || t - ts[i - 1] > 20 * 60000) tratti.push([]);
+    tratti[tratti.length - 1].push([X(t), Y(vs[i])]);
+  });
+  tratti.forEach(p => {
+    if (p.length < 2) { el('circle', { cx: p[0][0], cy: p[0][1], r: 2.5, fill: '#F2B65A' }); return; }
+    const linea = p.map((q, i) => (i ? 'L' : 'M') + q[0] + ' ' + q[1]).join(' ');
+    el('path', { d: linea + ' L' + p[p.length - 1][0] + ' ' + y1 + ' L' + p[0][0] + ' ' + y1 + 'Z', fill: 'rgba(242,182,90,0.15)' });
+    el('path', { d: linea, fill: 'none', stroke: '#F2B65A', 'stroke-width': 2, 'stroke-linejoin': 'round' });
+  });
   el('circle', { cx: X(ts[ts.length - 1]), cy: Y(vs[vs.length - 1]), r: 4, fill: '#F2B65A' });
   el('text', { x: x0, y: 144, 'font-size': 11, fill: '#A3ADB5' }, oraRoma(letture[0].t));
   el('text', { x: x1, y: 144, 'text-anchor': 'end', 'font-size': 11, fill: '#A3ADB5' }, 'adesso');
